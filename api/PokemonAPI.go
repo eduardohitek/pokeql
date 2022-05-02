@@ -29,7 +29,7 @@ func (p *PokemonAPI) GetPokemons() (models.Result, error) {
 
 	body, httpStatus, err := executeHTTPRequest(req)
 	if err != nil {
-		log.Println("Error on getting the Transactions", err)
+		log.Println("Error on getting the Pokemon List", err)
 		return models.Result{}, err
 	}
 
@@ -45,6 +45,36 @@ func (p *PokemonAPI) GetPokemons() (models.Result, error) {
 	if err != nil {
 		log.Println("Error on retrieving the Response Data!", err)
 		return models.Result{}, err
+	}
+
+	return result, nil
+}
+
+func (p *PokemonAPI) GetPokemonDetails(url string) (models.PokemonDetail, error) {
+	req, err := http.NewRequest(http.MethodGet, url, http.NoBody)
+	if err != nil {
+		log.Println("Error on creating the http request", err)
+		return models.PokemonDetail{}, err
+	}
+
+	body, httpStatus, err := executeHTTPRequest(req)
+	if err != nil {
+		log.Println("Error on getting the Pokemon Detail", err)
+		return models.PokemonDetail{}, err
+	}
+
+	if httpStatus != http.StatusOK {
+		log.Println("The HTTP Response was not expected: " + strconv.Itoa(httpStatus))
+		return models.PokemonDetail{}, errors.New(
+			"The HTTP Response was not expected: " + strconv.Itoa(httpStatus) + ": " + string(string(body)))
+	}
+
+	var result models.PokemonDetail
+
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		log.Println("Error on retrieving the Response Data!", err)
+		return models.PokemonDetail{}, err
 	}
 
 	return result, nil
